@@ -26,3 +26,4 @@ git push -u origin main
 - Deploy on Vercel:
   1. Install Vercel CLI: `npm i -g vercel`
   2. Run `vercel` and follow prompts
+# workspacesai
