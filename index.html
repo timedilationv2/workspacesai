@@ -1,13 +1,552 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sophieAi</title>
-  <link rel="icon" href="/favicon.svg" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Workspace</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Fira+Code&display=swap" rel="stylesheet" />
+
+<!-- === NEW: Prism for code highlighting === -->
+<link rel="stylesheet" href="https://unpkg.com/prismjs/themes/prism-tomorrow.css" />
+<script src="https://unpkg.com/prismjs/prism.js" defer></script>
+<script src="https://unpkg.com/prismjs/components/prism-javascript.min.js" defer></script>
+
+<style>
+:root{
+  --emerald-dusk:#00ff9d;--magenta-twilight:#ff00aa;--orange-twilight:#ff7f00;
+  --cyan-glow:#00ffff;--violet-glow:#8f00ff;
+}
+body{
+  font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,#0d1a26,#002240,#1a0d26);
+  color:#e0e0e0;overflow-x:hidden;
+  transition:background-color .5s,color .5s;
+}
+/* Glass panel */
+.panel{
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(22px) saturate(180%);
+  -webkit-backdrop-filter:blur(22px) saturate(180%);
+  border-radius:24px;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 8px 32px rgba(0,0,0,.22);
+  transition:transform .3s,box-shadow .3s,background .5s,border-color .5s;
+  display:flex;flex-direction:column;position:relative;
+}
+/* subtle inner border */
+.panel:before{
+  content:"";position:absolute;inset:0;border-radius:24px;
+  pointer-events:none;
+  border:1px solid rgba(255,255,255,.08);
+}
+.panel:hover{
+  transform:translateY(-6px) scale(1.015);
+  box-shadow:0 18px 56px rgba(0,0,0,.32);
+  border-color:rgba(255,255,255,.24);
+}
+.panel-header{border-bottom:1px solid rgba(255,255,255,.08);transition:border-color .5s;}
+.panel-title{color:#fff;text-shadow:0 0 5px var(--cyan-glow);transition:color .5s,text-shadow .5s;}
+textarea,input[type=text],input[type=url],input[type=email]{
+  background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.2);color:#e0e0e0;
+}
+textarea::placeholder,input::placeholder{color:rgba(255,255,255,.5);}
+textarea:focus,input:focus{
+  border-color:var(--emerald-dusk);box-shadow:0 0 15px 0 var(--emerald-dusk);
+}
+.btn-primary{
+  background:linear-gradient(135deg,#c81d8e,#d15a00);color:#fff;border-color:rgba(255,255,255,.2);
+}
+.btn-secondary{
+  background-color:rgba(255,255,255,.15);color:#e0e0e0;border-color:rgba(255,255,255,.2);
+}
+.btn-secondary:hover{background-color:rgba(255,255,255,.25);}
+.btn-danger{
+  background:linear-gradient(135deg,#b91c1c,#d93b3b);color:#fff;border-color:rgba(255,255,255,.2);
+}
+.item-card{
+  background-color:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.1);
+}
+.item-content{color:#f0f0f0;white-space:pre-wrap;word-break:break-word;}
+.item-timestamp{color:rgba(255,255,255,.5);}
+.main-header{text-shadow:0 0 15px var(--emerald-dusk),0 0 25px var(--violet-glow);}
+.link{color:var(--cyan-glow);}
+
+/* Day mode */
+body.day-mode{background:#f0f2f5;color:#1f2937;}
+.day-mode .panel{
+  background:rgba(255,255,255,.82);border-color:rgba(0,0,0,.1);
+  box-shadow:0 4px 12px rgba(0,0,0,.06);
+}
+.day-mode .panel:hover{
+  box-shadow:0 8px 26px rgba(0,0,0,.1);border-color:rgba(0,0,0,.18);
+}
+.day-mode .panel-header{border-bottom:1px solid #e5e7eb;}
+.day-mode .panel-title{color:#111827;text-shadow:none;}
+.day-mode textarea,.day-mode input[type=text],.day-mode input[type=url],.day-mode input[type=email]{
+  background:#fff;border-color:#d1d5db;color:#1f2937;
+}
+.day-mode textarea::placeholder,.day-mode input::placeholder{color:#9ca3af;}
+.day-mode textarea:focus,.day-mode input:focus{
+  border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.2);
+}
+.day-mode .btn-primary{background:#2563eb;border-color:transparent;}
+.day-mode .btn-secondary{background:#e5e7eb;color:#1f2937;border-color:transparent;}
+.day-mode .btn-secondary:hover{background:#d1d5db;}
+.day-mode .btn-danger{background:#dc2626;border-color:transparent;}
+.day-mode .item-card{background:#f9fafb;border-color:#e5e7eb;}
+.day-mode .item-content{color:#1f2937;}
+.day-mode .item-timestamp{color:#6b7280;}
+.day-mode .main-header{text-shadow:none;}
+.day-mode .link{color:#2563eb;}
+
+.workspace-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:1.5rem;}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;}
+.panel-title{font-size:1.125rem;font-weight:500;}
+.panel-body{padding:1.5rem;flex-grow:1;overflow-y:auto;}
+textarea,input[type=text],input[type=url],input[type=email]{width:100%;border-radius:16px;padding:.75rem 1rem;font-size:.875rem;transition:all .3s;}
+.code-editor{font-family:'Fira Code',monospace;border-radius:16px;}
+.btn{
+  padding:.75rem 1.5rem;border-radius:9999px;font-weight:500;cursor:pointer;
+  transition:transform .2s,box-shadow .2s,background .3s;
+  display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+  border:1px solid transparent;text-shadow:0 0 3px rgba(0,0,0,.2);
+}
+.btn:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.2);}
+.btn:active{transform:translateY(-1px);}
+.icon-btn{padding:.6rem;}
+.item-card{display:flex;flex-direction:column;padding:1rem;border-radius:16px;margin-bottom:.75rem;gap:.5rem;transition:background-color .5s,border-color .5s;}
+.item-meta{display:flex;justify-content:space-between;align-items:center;}
+
+.sticky-notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;}
+.sticky-note{height:150px;padding:1rem;border-radius:16px;box-shadow:0 2px 4px rgba(0,0,0,.1);position:relative;}
+.sticky-note textarea{
+  background:transparent;border:none;resize:none;height:calc(100% - 20px);
+  padding:0;font-family:'Inter',sans-serif;color:#1f2937;
+}
+.sticky-note textarea:focus{box-shadow:none;border:none;}
+.sticky-note .delete-sticky-btn{position:absolute;top:8px;right:8px;opacity:.3;transition:opacity .2s;}
+.sticky-note:hover .delete-sticky-btn{opacity:1;}
+.bg-sticky-yellow{background-color:#fffbeb;}
+.bg-sticky-pink{background-color:#fdf2f8;}
+.bg-sticky-blue{background-color:#eff6ff;}
+.bg-sticky-green{background-color:#f0fdf4;}
+
+.toast{
+  position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,var(--magenta-twilight),var(--orange-twilight));
+  color:#fff;padding:.75rem 1.5rem;border-radius:9999px;font-weight:500;
+  opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s,transform .3s;z-index:100;
+  box-shadow:0 5px 15px rgba(0,0,0,.2);
+}
+.toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
+
+/* Theme switch */
+.theme-switch-wrapper{display:flex;align-items:center;gap:.5rem;}
+.theme-switch{display:inline-block;height:26px;position:relative;width:50px;}
+.theme-switch input{display:none;}
+.slider{
+  background-color:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.2);
+  bottom:0;cursor:pointer;left:0;position:absolute;right:0;top:0;
+  transition:.4s;border-radius:26px;
+}
+.slider:before{
+  background-color:#fff;bottom:3px;content:"";height:20px;left:3px;position:absolute;
+  transition:.4s;width:20px;border-radius:50%;
+}
+input:checked + .slider{background-color:#3b82f6;border-color:transparent;}
+input:checked + .slider:before{transform:translateX(24px);}
+.day-mode .slider{background-color:#ccc;border-color:transparent;}
+
+/* === NEW: subtle noise overlay for glass vibe === */
+body:after{
+  content:"";position:fixed;inset:0;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='a'%3E%3CfeTurbulence baseFrequency='.65' seed='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)' opacity='.05'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;
+}
+</style>
 </head>
-<body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
+<body class="p-6 md:p-10">
+
+<header class="mb-12 text-center relative">
+  <h1 class="main-header text-5xl font-bold text-white">Workspace</h1>
+  <p class="text-gray-400 mt-3">Your personal dashboard for links, notes, and code. All data is saved locally.</p>
+
+  <!-- === NEW: Global search === -->
+  <div class="mt-6 max-w-xl mx-auto">
+    <input id="global-search" type="text" placeholder="Search everything…" class="w-full rounded-2xl px-4 py-2 text-sm bg-white/5 border border-white/10 focus:border-[var(--emerald-dusk)] focus:ring-0" />
+  </div>
+
+  <div class="absolute top-0 right-0 theme-switch-wrapper">
+    <label class="theme-switch" for="theme-checkbox">
+      <input type="checkbox" id="theme-checkbox" aria-label="Toggle theme"/>
+      <div class="slider"></div>
+    </label>
+  </div>
+</header>
+
+<main class="workspace-grid" id="workspace">
+  <!-- Links -->
+  <section id="links-panel" class="panel" data-type="links">
+    <div class="panel-header">
+      <h2 class="panel-title">🔗 Links</h2>
+      <!-- === NEW: Export -->
+      <button class="btn btn-secondary icon-btn" id="export-btn" aria-label="Export data">⬇︎</button>
+    </div>
+    <div class="panel-body">
+      <form id="add-link-form" class="flex flex-col sm:flex-row gap-3 mb-4">
+        <input type="text" id="link-title-input" placeholder="Title" required>
+        <input type="url" id="link-url-input" placeholder="https://example.com" required>
+        <button type="submit" class="btn btn-primary">Add</button>
+      </form>
+      <div id="links-list" class="space-y-2" data-list></div>
+    </div>
+  </section>
+
+  <!-- Clipboard -->
+  <section id="clipboard-panel" class="panel" data-type="clipboard">
+    <div class="panel-header"><h2 class="panel-title">📋 Clipboard</h2></div>
+    <div class="panel-body">
+      <form id="add-clipboard-form" class="flex flex-col gap-3 mb-4">
+        <textarea id="clipboard-input" placeholder="Paste content here..." required rows="3"></textarea>
+        <button type="submit" class="btn btn-primary self-end">Add Entry</button>
+      </form>
+      <div id="clipboard-list" data-list></div>
+    </div>
+  </section>
+
+  <!-- Code -->
+  <section id="code-panel" class="panel" data-type="code">
+    <div class="panel-header"><h2 class="panel-title">💻 Code Snippets</h2></div>
+    <div class="panel-body">
+      <form id="add-code-form" class="flex flex-col gap-3 mb-4">
+        <textarea id="code-input" class="code-editor" placeholder="Paste code here..." required rows="4"></textarea>
+        <button type="submit" class="btn btn-primary self-end">Add Snippet</button>
+      </form>
+      <div id="code-list" data-list></div>
+    </div>
+  </section>
+
+  <!-- Notes -->
+  <section id="notes-panel" class="panel" data-type="notes">
+    <div class="panel-header">
+      <h2 class="panel-title">📝 Notes</h2>
+      <!-- === NEW: MD toggle -->
+      <label class="text-xs flex items-center gap-1">
+        <input type="checkbox" id="md-toggle" class="accent-[var(--emerald-dusk)]" />
+        Render Markdown
+      </label>
+    </div>
+    <div class="panel-body">
+      <form id="add-note-form" class="flex flex-col gap-3 mb-4">
+        <textarea id="note-input" placeholder="Jot down a new note..." required rows="3"></textarea>
+        <button type="submit" class="btn btn-primary self-end">Add Note</button>
+      </form>
+      <div id="notes-list" data-list></div>
+    </div>
+  </section>
+
+  <!-- Stickies -->
+  <section id="sticky-notes-panel" class="panel" data-type="stickies">
+    <div class="panel-header">
+      <h2 class="panel-title">📌 Sticky Notes</h2>
+      <button id="add-sticky-btn" class="btn btn-primary" aria-label="Add sticky">New Sticky</button>
+    </div>
+    <div class="panel-body">
+      <div id="sticky-notes-list" class="sticky-notes-grid"></div>
+    </div>
+  </section>
+
+  <!-- Email -->
+  <section id="email-panel" class="panel" data-type="mail">
+    <div class="panel-header"><h2 class="panel-title">✉️ Quick Email</h2></div>
+    <div class="panel-body">
+      <form id="email-form" class="space-y-4">
+        <input type="email" id="email-to" placeholder="To:" required>
+        <input type="text" id="email-subject" placeholder="Subject:">
+        <textarea id="email-body" placeholder="Email body..." rows="5"></textarea>
+        <a id="generate-email-link" href="#" class="btn btn-primary w-full">Generate Mailto Link</a>
+      </form>
+    </div>
+  </section>
+</main>
+
+<!-- === NEW: Import -->
+<div class="fixed bottom-6 right-6 flex flex-col gap-2">
+  <label class="btn btn-secondary cursor-pointer">
+    Import JSON <input type="file" id="import-file" accept="application/json" class="hidden">
+  </label>
+</div>
+
+<div id="toast-notification" class="toast"></div>
+
+<script>
+// ===== Constants =====
+const LS_KEY = 'digitalWorkspaceState_v4';
+
+// ===== State =====
+let state = {
+  links: [],
+  clipboard: [],
+  code: [],
+  notes: [],
+  stickies: []
+};
+
+// ===== Helpers =====
+const $ = (sel, scope=document) => scope.querySelector(sel);
+const $$ = (sel, scope=document) => [...scope.querySelectorAll(sel)];
+const ts = () => new Date().toLocaleString('en-US',{dateStyle:'short',timeStyle:'short'});
+
+let toastTimer;
+function showToast(msg){
+  const t = $('#toast-notification');
+  clearTimeout(toastTimer);t.textContent=msg;t.classList.add('show');
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+async function copyText(text){
+  try{await navigator.clipboard.writeText(text);showToast('Copied!');}
+  catch(e){console.error(e);showToast('Copy failed');}
+}
+
+function save(){localStorage.setItem(LS_KEY, JSON.stringify(state));}
+function load(){
+  const raw = localStorage.getItem(LS_KEY);
+  if(raw){state = JSON.parse(raw);}
+  renderAll();
+}
+// Markdown render (lazy small parser)
+function mdRender(str){
+  // ultra-light, just bold/italic/code/links for now
+  return str
+    .replace(/`([^`]+)`/g,'<code class="px-1 py-0.5 bg-black/30 rounded text-xs">$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g,'<em>$1</em>')
+    .replace(/$begin:math:display$([^$end:math:display$]+)\]$begin:math:text$([^)]+)$end:math:text$/g,'<a href="$2" target="_blank" class="underline text-[var(--cyan-glow)]">$1</a>')
+    .replace(/\n/g,'<br>');
+}
+
+// ===== Theme =====
+const themeToggle = $('#theme-checkbox');
+function setTheme(isDay){
+  if(isDay){document.body.classList.add('day-mode');themeToggle.checked=true;localStorage.setItem('theme','day');}
+  else{document.body.classList.remove('day-mode');themeToggle.checked=false;localStorage.setItem('theme','night');}
+}
+if(localStorage.getItem('theme')==='day') setTheme(true); else setTheme(false);
+themeToggle.addEventListener('change',e=>setTheme(e.target.checked));
+
+// ===== Rendering =====
+function renderLinks(){
+  const list = $('#links-list');
+  list.innerHTML = state.links.map((l,i)=>`
+    <div class="item-card" draggable="true" data-index="${i}">
+      <div class="flex justify-between items-center">
+        <a href="${l.url}" target="_blank" rel="noopener" class="link font-medium hover:underline">${l.title}</a>
+        <div class="flex gap-2">
+          <button data-act="del" data-type="links" data-index="${i}" class="btn btn-danger icon-btn" aria-label="Delete link">🗑</button>
+        </div>
+      </div>
+    </div>
+  `).join('') || `<p class="text-gray-400 text-center text-sm">No links added yet.</p>`;
+}
+
+function listTemplate(item,i,type,opts={}){
+  const canCopy = type!=='note';
+  const isCode = type==='code';
+  const mdOn = $('#md-toggle')?.checked;
+  const contentHTML = isCode
+    ? `<pre class="item-content p-3 bg-black/30 rounded-lg whitespace-pre-wrap"><code class="language-javascript">${Prism.highlight(item.content, Prism.languages.javascript, 'javascript')}</code></pre>`
+    : mdOn && type==='note'
+      ? `<div class="item-content prose prose-invert">${mdRender(item.content)}</div>`
+      : `<pre class="item-content">${item.content}</pre>`;
+
+  return `
+  <div class="item-card" draggable="true" data-index="${i}">
+    ${contentHTML}
+    <div class="item-meta">
+      <span class="item-timestamp">${item.timestamp || ''}</span>
+      <div class="flex gap-2">
+        ${canCopy?`<button data-act="copy" data-type="${type}" data-index="${i}" class="btn btn-secondary icon-btn" aria-label="Copy ${type}">📋</button>`:''}
+        <button data-act="del" data-type="${type}" data-index="${i}" class="btn btn-danger icon-btn" aria-label="Delete ${type}">🗑</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderGeneric(type, containerSel){
+  const list = $(containerSel);
+  list.innerHTML = state[type].map((it,i)=>listTemplate(it,i,type)).join('') || `<p class="text-gray-400 text-center text-sm">No ${type} entries yet.</p>`;
+}
+
+function renderStickies(){
+  const colors = ['bg-sticky-yellow','bg-sticky-pink','bg-sticky-blue','bg-sticky-green'];
+  const wrap = $('#sticky-notes-list');
+  wrap.innerHTML = state.stickies.map((s,i)=>`
+    <div class="sticky-note ${colors[s.colorIndex]}" draggable="true" data-index="${i}">
+      <textarea data-index="${i}" class="sticky-textarea w-full h-full">${s.content}</textarea>
+      <button data-act="del-sticky" data-index="${i}" class="delete-sticky-btn btn btn-danger icon-btn !p-1" aria-label="Delete sticky">🗑</button>
+    </div>
+  `).join('') || `<p class="text-gray-400 text-center text-sm col-span-full">No sticky notes yet.</p>`;
+}
+
+function renderAll(){
+  renderLinks();
+  renderGeneric('clipboard','#clipboard-list');
+  renderGeneric('code','#code-list');
+  renderGeneric('notes','#notes-list');
+  renderStickies();
+}
+
+// ===== Add handlers =====
+function addHandler(formSel,inputSel,arrKey){
+  const form = $(formSel);const input = $(inputSel);
+  form.addEventListener('submit',e=>{
+    e.preventDefault();
+    const val = input.value.trim();
+    if(!val) return;
+    state[arrKey].push({content:val,timestamp:ts()});
+    input.value='';
+    save();renderGeneric(arrKey,`#${arrKey}-list`);
+  });
+}
+
+addHandler('#add-clipboard-form','#clipboard-input','clipboard');
+addHandler('#add-code-form','#code-input','code');
+addHandler('#add-note-form','#note-input','notes');
+
+$('#add-link-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const title = $('#link-title-input').value.trim();
+  const url = $('#link-url-input').value.trim();
+  if(title && url){
+    state.links.push({title,url});
+    e.target.reset();save();renderLinks();
+  }
+});
+
+$('#add-sticky-btn').addEventListener('click',()=>{
+  state.stickies.push({content:'',colorIndex:state.stickies.length%4});
+  save();renderStickies();
+});
+
+// ===== Delegated actions (delete/copy/drag) =====
+document.body.addEventListener('click',e=>{
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  const act = btn.dataset.act;
+  if(!act) return;
+
+  if(act==='del'){
+    const {type,index} = btn.dataset;
+    state[type].splice(+index,1);
+    save();renderGeneric(type,`#${type}-list`);
+  }else if(act==='del-sticky'){
+    state.stickies.splice(+btn.dataset.index,1);
+    save();renderStickies();
+  }else if(act==='copy'){
+    const {type,index}=btn.dataset;
+    copyText(state[type][+index].content);
+  }
+});
+
+// Sticky input sync
+$('#sticky-notes-list').addEventListener('input',e=>{
+  if(e.target.matches('.sticky-textarea')){
+    const i = +e.target.dataset.index;
+    state.stickies[i].content = e.target.value;
+    save();
+  }
+});
+
+// Email link
+$('#email-form').addEventListener('input',()=>{
+  const to = encodeURIComponent($('#email-to').value);
+  const subject = encodeURIComponent($('#email-subject').value);
+  const body = encodeURIComponent($('#email-body').value);
+  $('#generate-email-link').href = `mailto:${to}?subject=${subject}&body=${body}`;
+});
+
+// Markdown toggle re-render
+$('#md-toggle')?.addEventListener('change',()=>{renderGeneric('notes','#notes-list');});
+
+// ===== Drag & Drop reorder =====
+let dragSrcType=null, dragSrcIndex=null;
+
+document.addEventListener('dragstart',e=>{
+  const card = e.target.closest('[draggable="true"]');
+  if(!card) return;
+  const panel = card.closest('[data-type]');
+  if(!panel) return;
+  dragSrcType = panel.dataset.type;
+  dragSrcIndex = +card.dataset.index;
+  e.dataTransfer.effectAllowed='move';
+});
+document.addEventListener('dragover',e=>{
+  if(dragSrcType) e.preventDefault();
+});
+document.addEventListener('drop',e=>{
+  if(!dragSrcType) return;
+  const card = e.target.closest('[draggable="true"]');
+  const panel = card?.closest('[data-type]');
+  if(!panel || panel.dataset.type!==dragSrcType) {dragSrcType=null;return;}
+  const tgtIndex = +card.dataset.index;
+  const arr = state[dragSrcType];
+  const [moved] = arr.splice(dragSrcIndex,1);
+  arr.splice(tgtIndex,0,moved);
+  save();
+  dragSrcType==='stickies'?renderStickies(): (dragSrcType==='links'?renderLinks():renderGeneric(dragSrcType,`#${dragSrcType}-list`));
+  dragSrcType=null;
+});
+
+// ===== Global Search =====
+$('#global-search').addEventListener('input',e=>{
+  const q = e.target.value.toLowerCase();
+  $$('#workspace [data-list]').forEach(list=>{
+    const type = list.closest('[data-type]').dataset.type;
+    const arr = state[type];
+    list.innerHTML = arr
+      .map((it,i)=>({html:listTemplate(it,i,type),match:(JSON.stringify(it).toLowerCase().includes(q))}))
+      .filter(o=>o.match)
+      .map(o=>o.html).join('') || `<p class="text-gray-400 text-center text-sm">No match.</p>`;
+  });
+  if(q==='') renderAll();
+});
+
+// ===== Export / Import =====
+$('#export-btn').addEventListener('click',()=>{
+  const blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url;a.download='workspace-export.json';a.click();
+  URL.revokeObjectURL(url);
+});
+$('#import-file').addEventListener('change',e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    try{
+      const data = JSON.parse(ev.target.result);
+      state = {...state,...data};
+      save();renderAll();showToast('Imported!');
+    }catch(err){console.error(err);showToast('Import failed');}
+  };
+  reader.readAsText(file);
+});
+
+// === Auto-resize textareas ===
+document.addEventListener('input',e=>{
+  if(e.target.tagName==='TEXTAREA'){
+    e.target.style.height='auto';
+    e.target.style.height = e.target.scrollHeight+'px';
+  }
+});
+
+// Init
+load();
+</script>
 </body>
 </html>
