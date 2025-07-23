@@ -1,4 +1,6 @@
-# SophieAI React App
+workspaces
+
+https://timedilationv2.github.io/workspacesai/
 
 ## Setup
 
