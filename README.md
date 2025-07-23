@@ -1,8 +1,8 @@
 <div align="center">
 
-# [PROJECT NAME]
+# Workspaces
 
-### Aren't you sick of pre arranging everything on your desktop - Remember where it is - track it... :///
+### Aren't you sick of pre arranging everything on your desktop - also keeping track of it all? Check this idea out!
 
 <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMyIgdmlld0JveD0iMCAwIDMwMCAzIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImEiIHgxPSIwJSIgeTE9IjUwJSIgeDI9IjEwMCUiIHkyPSI1MCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwMEJGRkYiIHN0b3Atb3BhY2l0eT0iMCIvPjxzdG9wIG9mZnNldD0iNTAlIiBzdG9wLWNvbG9yPSIjMDBCRkZGIiBzdG9wLW9wYWNpdHk9IjEiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMEJGRkYiIHN0b3Atb3BhY2l0eT0iMCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMyIgZmlsbD0idXJsKCNhKSIgZmlsbC1vcGFjaXR5PSIwLjciLz48L3N2Zz4=" alt="separator"/>
 
@@ -21,7 +21,7 @@
 </div>
 
 ## Vision Matrix
-> To create a unified, intelligent, and personal desktop experience that reduces context switching and centralizes a user's daily digital tasks in a single, modular workspace.
+> To create an easy going and personal desktop experience that reduces context switching and centralizes a user's daily digital tasks in a single, modular workspace.
 
 ---
 
